@@ -1,0 +1,39 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "search.exclude": {
+    "**/coverage": true,
+    "**/node_modules": true,
+    "**/.serverless": true,
+    "**/build": true,
+    "**/bundles": true,
+    "**/dist": true,
+    "**/*.tsbuildinfo": true,
+    "**/cdk.out": true,
+    "nx-cache/**": true,
+    "pnpm-lock.yaml": true
+  },
+  "search.followSymlinks": false,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/*.tsbuildinfo": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  "[dotenv][ignore][properties][shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[html][javascript][json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" }
+}

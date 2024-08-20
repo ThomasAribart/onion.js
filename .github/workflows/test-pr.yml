@@ -1,0 +1,61 @@
+name: 🎯 Test PR
+# cancel previous runs on the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  CI: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test-pr:
+    name: 🎯 Test PR on Node ${{ matrix.node }} / TS ${{ matrix.typescript }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [16, 18, 20]
+        typescript:
+          [
+            'default',
+            '~4.6.4',
+            '~4.7.4',
+            '~4.8.3',
+            '~4.9.5',
+            '~5.0.4',
+            '~5.1.6',
+            '~5.2.2',
+            '~5.3.3',
+            '~5.4.2'
+          ]
+    timeout-minutes: 30
+    steps:
+      - name: ♻️ Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: 🏗️ Set up pnpm
+        uses: pnpm/action-setup@v4.0.0
+
+      - name: 🏗️ Set up Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: 🚚 Install dependencies
+        run: pnpm install --frozen-lockfile
+          pnpm add --save-dev typescript@${{ matrix.typescript }}
+        shell: bash
+
+      - name: 🎯 Run tests
+        run: pnpm test
