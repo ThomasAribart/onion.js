@@ -1,3 +1,3 @@
 # onion-js
 
-Type-safe middleware library
+Type-safe high-order functions library.
