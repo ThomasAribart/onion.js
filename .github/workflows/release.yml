@@ -23,7 +23,6 @@ jobs:
         uses: pnpm/action-setup@v4.0.0
 
       - name: 🏗️ Set up Node.js
-        id: setup-node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -52,8 +51,9 @@ jobs:
         uses: pnpm/action-setup@v4.0.0
 
       - name: 🏗️ Set up Node.js
-        id: setup-node
         uses: actions/setup-node@v4
+        with:
+          registry-url: https://registry.npmjs.org
 
       - name: 🚚 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -62,9 +62,14 @@ jobs:
       - name: 🏗️ Build
         run: pnpm build
 
-      - name: 🚀 Release
-        run: |
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          echo "RELEASE_NPM_TAG=${{ github.event.release.prerelease && 'alpha' ||  'latest' }}" >> $GITHUB_ENV
-          pnpm version $RELEASE_VERSION --no-git-tag-version
-          pnpm publish --access public --tag $RELEASE_NPM_TAG
+      - name: 🚀 Release (1/4)
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: 🚀 Release (2/4)
+        run: echo "RELEASE_NPM_TAG=${{ github.event.release.prerelease && 'alpha' ||  'latest' }}" >> $GITHUB_ENV
+
+      - name: 🚀 Release (3/4)
+        run: pnpm version $RELEASE_VERSION --no-git-tag-version
+
+      - name: 🚀 Release (4/4)
+        run: pnpm publish --access public --tag $RELEASE_NPM_TAG
