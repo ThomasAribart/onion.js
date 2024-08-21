@@ -1,6 +1,6 @@
 import type { Compose, ComposeLeft } from 'hotscript'
 
-import type { InwardResolvers, Layer, OutwardResolvers, Types } from './layer.js'
+import type { InwardFns, Layer, OutwardFns, Types } from './layer.js'
 
 type Widest<TYPES extends object[], OUTPUT extends object = never> = TYPES extends [
   infer TYPES_HEAD,
@@ -22,8 +22,8 @@ type Widest<TYPES extends object[], OUTPUT extends object = never> = TYPES exten
 
 type ComposeLayers<LAYERS extends Layer[]> = Layer<
   Widest<Types<LAYERS>>,
-  Compose<OutwardResolvers<LAYERS>>,
-  ComposeLeft<InwardResolvers<LAYERS>>
+  Compose<OutwardFns<LAYERS>>,
+  ComposeLeft<InwardFns<LAYERS>>
 >
 
 const composeTwo = (layerA: Layer, layerB: Layer) => (arg: object) => layerA(layerB(arg)) as object
