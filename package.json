@@ -25,7 +25,6 @@
   "files": [
     "dist"
   ],
-  "type": "module",
   "main": "dist/csj/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -33,6 +32,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json && tsc-alias -p tsconfig.esm.json",
     "build:types": "tsc -p tsconfig.types.json && tsc-alias -p tsconfig.types.json",
+    "prebuild": "rm -rf dist",
     "build": "pnpm run build:cjs && pnpm run build:esm && pnpm run build:types",
     "test": "pnpm test-type && pnpm test-format && pnpm test-linter && pnpm test-unit",
     "test-format": "prettier --check .",
