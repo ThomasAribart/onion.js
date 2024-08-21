@@ -30,6 +30,10 @@
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
+    "build:cjs": "tsc -p tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json && tsc-alias -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.types.json && tsc-alias -p tsconfig.types.json",
+    "build": "pnpm run build:cjs && pnpm run build:esm && pnpm run build:types",
     "test": "pnpm test-type && pnpm test-format && pnpm test-linter && pnpm test-unit",
     "test-format": "prettier --check .",
     "test-linter": "eslint --ext=js,ts .",
@@ -50,6 +54,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "prettier": "^3.3.3",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.3.3",
     "vite-tsconfig-paths": "^4.2.2",
     "vitest": "1.6.0"
