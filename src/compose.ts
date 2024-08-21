@@ -20,7 +20,7 @@ type Widest<TYPES extends object[], OUTPUT extends object = never> = TYPES exten
     : never
   : OUTPUT
 
-type ComposeLayers<LAYERS extends Layer[]> = Layer<
+export type ComposeLayers<LAYERS extends Layer[]> = Layer<
   Widest<Types<LAYERS>>,
   Compose<OutwardFns<LAYERS>>,
   ComposeLeft<InwardFns<LAYERS>>
