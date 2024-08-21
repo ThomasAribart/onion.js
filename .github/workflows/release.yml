@@ -55,6 +55,10 @@ jobs:
         id: setup-node
         uses: actions/setup-node@v4
 
+      - name: 🚚 Install dependencies
+        run: pnpm install --frozen-lockfile
+        shell: bash
+
       - name: 🏗️ Build
         run: pnpm build
 
