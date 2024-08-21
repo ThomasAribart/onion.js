@@ -21,20 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [16, 18, 20]
-        typescript:
-          [
-            'default',
-            '~4.6.4',
-            '~4.7.4',
-            '~4.8.3',
-            '~4.9.5',
-            '~5.0.4',
-            '~5.1.6',
-            '~5.2.2',
-            '~5.3.3',
-            '~5.4.2'
-          ]
+        node: [18, 20]
+        typescript: ['~4.7.4', '~4.8.3', '~4.9.5', '~5.0.4', '~5.1.6', '~5.2.2', '~5.3.3', '~5.4.2']
     timeout-minutes: 30
     steps:
       - name: ♻️ Checkout
@@ -53,7 +41,8 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: 🚚 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
           pnpm add --save-dev typescript@${{ matrix.typescript }}
         shell: bash
 
