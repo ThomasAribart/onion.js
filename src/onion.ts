@@ -1,6 +1,6 @@
 import type { Pipe } from 'hotscript'
 
-import type { InwardResolvers, Layer, OutwardResolvers } from './layer.js'
+import type { InwardFns, Layer, OutwardFns } from './layer.js'
 
 const $layers = Symbol('$layers')
 type $layers = typeof $layers
@@ -8,8 +8,8 @@ type $layers = typeof $layers
 type OnionWrap<CORE extends object> = CORE & {
   with<LAYERS extends Layer[]>(
     ...layers: LAYERS
-  ): Pipe<CORE, OutwardResolvers<LAYERS>> extends object
-    ? OnionWrap<Pipe<CORE, OutwardResolvers<LAYERS>>>
+  ): Pipe<CORE, OutwardFns<LAYERS>> extends object
+    ? OnionWrap<Pipe<CORE, OutwardFns<LAYERS>>>
     : never
 }
 
@@ -37,7 +37,7 @@ export class Onion<SKIN extends object, LAYERS extends Layer[] = Layer[]> {
     return new Onion(...layers)
   }
 
-  from(core: Pipe<SKIN, InwardResolvers<LAYERS>>): SKIN {
+  from(core: Pipe<SKIN, InwardFns<LAYERS>>): SKIN {
     return [...this[$layers]].reverse().reduce((acc, hof) => hof(acc), core as unknown) as SKIN
   }
 }
