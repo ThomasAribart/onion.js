@@ -62,13 +62,8 @@ jobs:
       - name: 🏗️ Build
         run: pnpm build
 
-      # See https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
-      - name: 📌 Set version
-        run: |
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          pnpm version $RELEASE_VERSION --no-git-tag-version
-
       - uses: JS-DevTools/npm-publish@v3
         with:
+          version: ${{ github.event.release.tag_name }}
           token: ${{ secrets.NPM_TOKEN }}
           strategy: upgrade
