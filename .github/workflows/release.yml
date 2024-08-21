@@ -62,7 +62,7 @@ jobs:
       - name: 🏗️ Build
         run: pnpm build
 
-      - uses: JS-DevTools/npm-publish@v3
+      - uses: JS-DevTools/npm-publish@v2
         with:
           version: ${{ github.event.release.tag_name }}
           token: ${{ secrets.NPM_TOKEN }}
