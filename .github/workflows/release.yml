@@ -1,0 +1,70 @@
+name: 🚀 Release to NPM
+
+on:
+  release:
+    types: [published]
+
+env:
+  CI: true
+
+jobs:
+  test-release:
+    name: 🎯 Test Release on Node ${{ matrix.node }} / TS ${{ matrix.typescript }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20]
+        typescript: ['~4.7.4', '~4.8.3', '~4.9.5', '~5.0.4', '~5.1.6', '~5.2.2', '~5.3.3', '~5.4.2']
+    steps:
+      - name: ♻️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Set up pnpm
+        uses: pnpm/action-setup@v4.0.0
+
+      - name: 🏗️ Set up Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: 🚚 Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm add --save-dev typescript@${{ matrix.typescript }}
+        shell: bash
+
+      - name: 🎯 Run tests
+        run: pnpm test
+
+  release:
+    name: 🚀 Release
+    environment: CI
+    needs: test-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: ♻️ Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: 🏗️ Set up pnpm
+        uses: pnpm/action-setup@v4.0.0
+
+      - name: 🏗️ Set up Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+
+      - name: 🏗️ Build
+        run: pnpm build
+
+      # See https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
+      - name: 📌 Set version
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          pnpm version $RELEASE_VERSION --no-git-tag-version
+
+      - uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          strategy: upgrade
