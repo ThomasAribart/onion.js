@@ -4,7 +4,32 @@ Type-safe way to declare, use and compose high-order functions library based on 
 
 ## Defining Layers
 
-<!-- SCHEMA HERE -->
+```mermaid
+flowchart RL
+  after[After]
+
+  subgraph layer4[" "]
+    direction BT
+    subgraph layer3[" "]
+      subgraph layer2[" "]
+        subgraph layer1[" "]
+          before((Before))
+        end
+      end
+    end
+  before --> after
+  end
+
+  style before fill:#fff,stroke:none;
+  style layer1 fill:#F3EBFF,stroke:none,rx:100,ry:100;
+  style layer2 fill:#E7D6FF,stroke:none,rx:100,ry:100;
+  style layer3 fill:#DAC2FF,stroke:none,rx:100,ry:100;
+  style layer4 rx:100,ry:100, fill:none,stroke:none;
+  style after fill:none,stroke:none;
+  style layers fill:none,stroke:none,color:#aaa;
+
+  layers["Layers"] ~~~ layer4
+```
 
 In `Onion.JS`, _**Layers**_ are functions that transform _**Subjects**_ from a `before` state to an `after` state.
 
