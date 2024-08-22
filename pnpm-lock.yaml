@@ -39,6 +39,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      ts-toolbelt:
+        specifier: ^9.6.0
+        version: 9.6.0
       tsc-alias:
         specifier: ^1.8.10
         version: 1.8.10
@@ -1506,6 +1509,9 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
+
+  ts-toolbelt@9.6.0:
+    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
   tsc-alias@1.8.10:
     resolution: {integrity: sha512-Ibv4KAWfFkFdKJxnWfVtdOmB0Zi1RJVxcbPGiCDsFpCQSsmpWyuzHG3rQyI5YkobWwxFPEyQfu1hdo4qLG2zPw==}
@@ -3217,6 +3223,8 @@ snapshots:
   ts-api-utils@1.3.0(typescript@5.5.4):
     dependencies:
       typescript: 5.5.4
+
+  ts-toolbelt@9.6.0: {}
 
   tsc-alias@1.8.10:
     dependencies:
