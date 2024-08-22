@@ -2,7 +2,7 @@
 
 Type-safe way to declare, use and compose high-order functions library based on [Hotscript](https://github.com/gvergnaud/hotscript).
 
-## Defining Layers
+## Layers
 
 ```mermaid
 flowchart RL
@@ -34,9 +34,33 @@ flowchart RL
 In `Onion.JS`, _**Layers**_ are functions that transform _**Subjects**_ from a `before` state to an `after` state.
 
 ```mermaid
-flowchart TD
-    Start --> Stop
+flowchart RL
+  after[After]
+
+  subgraph layer4[" "]
+    direction BT
+    subgraph layer3[" "]
+      subgraph layer2[" "]
+        subgraph layer1[" "]
+          before((Before))
+        end
+      end
+    end
+  before --> after
+  end
+
+  style before fill:#fff,stroke:none;
+  style layer1 fill:#F3EBFF,stroke:none,rx:100,ry:100;
+  style layer2 fill:#E7D6FF,stroke:none,rx:100,ry:100;
+  style layer3 fill:#DAC2FF,stroke:none,rx:100,ry:100;
+  style layer4 rx:100,ry:100, fill:none,stroke:none;
+  style after fill:none,stroke:none;
+  style layers fill:none,stroke:none,color:#aaa;
+
+  layers["Layers"] ~~~ layer4
 ```
+
+_**Layers**_ are functions that transform _**Subjects**_ from a `before` state to an `after` state.
 
 For instance, you may want to `JSON.stringify` the `body` property of an object:
 
@@ -117,11 +141,11 @@ const after = Onion.produce<{ body: string }>()
 
 ## High-Order Functions
 
-**Functions** are a valid type of subjects, and that's where `OnionJS` starts to shine ✨
+**Functions** are a valid type of subjects, and that's where `OnionJS` shines ✨
 
 In this case, layers receive `before` functions and return `after` functions (hence the _"high-order function"_ name).
 
-It's hard to get your head around at first, so let's take an example! Let's apply `jsonStringifyBody` to the **output** of a function:
+For instance, let's apply `jsonStringifyBody` to the **output** of a function:
 
 ```ts
 import type { Functions, Objects } from 'hotscript'
@@ -175,7 +199,7 @@ const after = Onion.wrap({ body: { foo: 'bar' } }).with(logAndStringify)
 
 Sometimes, layer behaviors need to a specific context.
 
-Nothing stops us from **dynamically generate layers**:
+Nothing stops us from **dynamically generate layers** by using generic types:
 
 ```ts
 type JSONStringifyPropLayer<KEY extends string> = Layer<
