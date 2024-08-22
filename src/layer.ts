@@ -5,7 +5,7 @@ type $types = typeof $types
 
 export interface Layer<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TYPE extends object = any,
+  TYPE = any,
   OUTWARD_FN extends Fn = Fn,
   INWARD_FN extends Fn = Fn
 > {
@@ -19,10 +19,10 @@ export interface Layer<
 
 export type Type<LAYER extends Layer> = NonNullable<LAYER[$types]>['type']
 
-export type Types<LAYERS extends Layer[], OUTPUT extends object[] = []> = LAYERS extends [
-  infer LAYERS_HEAD,
-  ...infer LAYERS_TAIL
-]
+export type Types<
+  LAYERS extends Layer[],
+  OUTPUT extends unknown[] = []
+> = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
   ? LAYERS_HEAD extends Layer
     ? LAYERS_TAIL extends Layer[]
       ? Types<LAYERS_TAIL, [...OUTPUT, InwardFn<LAYERS_HEAD>]>
@@ -32,10 +32,10 @@ export type Types<LAYERS extends Layer[], OUTPUT extends object[] = []> = LAYERS
 
 export type OutwardFn<LAYER extends Layer> = NonNullable<LAYER[$types]>['outFn']
 
-export type OutwardFns<LAYERS extends Layer[], OUTPUT extends Fn[] = []> = LAYERS extends [
-  infer LAYERS_HEAD,
-  ...infer LAYERS_TAIL
-]
+export type OutwardFns<
+  LAYERS extends Layer[],
+  OUTPUT extends Fn[] = []
+> = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
   ? LAYERS_HEAD extends Layer
     ? LAYERS_TAIL extends Layer[]
       ? OutwardFns<LAYERS_TAIL, [...OUTPUT, OutwardFn<LAYERS_HEAD>]>
@@ -45,10 +45,10 @@ export type OutwardFns<LAYERS extends Layer[], OUTPUT extends Fn[] = []> = LAYER
 
 export type InwardFn<LAYER extends Layer> = NonNullable<LAYER[$types]>['inFn']
 
-export type InwardFns<LAYERS extends Layer[], OUTPUT extends Fn[] = []> = LAYERS extends [
-  infer LAYERS_HEAD,
-  ...infer LAYERS_TAIL
-]
+export type InwardFns<
+  LAYERS extends Layer[],
+  OUTPUT extends Fn[] = []
+> = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
   ? LAYERS_HEAD extends Layer
     ? LAYERS_TAIL extends Layer[]
       ? InwardFns<LAYERS_TAIL, [...OUTPUT, InwardFn<LAYERS_HEAD>]>

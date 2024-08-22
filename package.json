@@ -1,5 +1,5 @@
 {
-  "name": "onion-js",
+  "name": "onion-script",
   "description": "Type-safe high-order functions library",
   "homepage": "https://github.com/ThomasAribart/onion-js",
   "repository": {
@@ -58,10 +58,12 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "prettier": "^3.3.3",
+    "ts-toolbelt": "^9.6.0",
     "tsc-alias": "^1.8.10",
     "typescript": "^5.3.3",
     "vite-tsconfig-paths": "^4.2.2",
     "vitest": "1.6.0"
   },
-  "packageManager": "pnpm@9.1.4"
+  "packageManager": "pnpm@9.1.4",
+  "version": "0.1.3"
 }

@@ -99,21 +99,7 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': 'error',
         '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/no-unused-vars': 'error',
-        '@typescript-eslint/ban-types': [
-          'error',
-          {
-            types: {
-              FC: 'Use `const MyComponent = (props: Props): JSX.Element` instead',
-              SFC: 'Use `const MyComponent = (props: Props): JSX.Element` instead',
-              FunctionComponent: 'Use `const MyComponent = (props: Props): JSX.Element` instead',
-              'React.FC': 'Use `const MyComponent = (props: Props): JSX.Element` instead',
-              'React.SFC': 'Use `const MyComponent = (props: Props): JSX.Element` instead',
-              'React.FunctionComponent':
-                'Use `const MyComponent = (props: Props): JSX.Element` instead'
-            },
-            extendDefaults: true
-          }
-        ],
+        '@typescript-eslint/ban-types': 'error',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
         '@typescript-eslint/no-unnecessary-condition': 'error',
         '@typescript-eslint/no-unnecessary-type-arguments': 'error',
@@ -140,6 +126,15 @@ module.exports = {
             peerDependencies: true
           }
         ]
+      }
+    },
+    {
+      // disable `any` checks in tests
+      files: ['src/**/*.test.ts'],
+      rules: {
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off'
       }
     }
   ]
