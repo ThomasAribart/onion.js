@@ -17,7 +17,7 @@ In particular, it's awesome for building and using type-safe [**middlewares**](h
 - 🧅 <a href="#-onionwrap"><code>Onion.wrap</code></a>
 - ♻️ <a href="#️-onionproducetype"><code>Onion.produce</code></a>
 - 🚀 [Building Middlewares](#-building-middlewares)
-- 🏗️ [Composing Layers](#-composing-layers)
+- 🏗️ [Composing Layers](#%EF%B8%8F-composing-layers)
 - 💪 [Customizable Layers](#-customizable-layers)
 
 ## 🎬 Installation
