@@ -6,7 +6,7 @@
 
 # 🧅 Wrap everything, without breaking types 🥲
 
-`Onion.JS` is a **type-safe** and **ultra-lightweight** _(2KB)_ library to design and apply **wrappers**, based on [HotScript](https://github.com/gvergnaud/hotscript) **high-order types**.
+`OnionJS` is a **type-safe** and **ultra-lightweight** _(2KB)_ library to design and apply **wrappers**, based on [HotScript](https://github.com/gvergnaud/hotscript) **high-order types**.
 
 In particular, it's awesome for building and using type-safe [**middlewares**](https://en.wikipedia.org/wiki/Middleware) (see the [dedicated section](#-building-middlewares)).
 
@@ -32,7 +32,7 @@ yarn add @onion.js/core
 
 ## 🌈 Layers
 
-In `Onion.JS`, _**Layers**_ are functions that transform _**Subjects**_ from a `before` to an `after` state:
+In `OnionJS`, _**Layers**_ are functions that transform _**Subjects**_ from a `before` to an `after` state:
 
 <img src="assets/layers.png" width="100%" align="center" />
 
@@ -124,7 +124,7 @@ const after = Onion.produce<{ headers: null; body: string }>()
 
 ## 🚀 Building Middlewares
 
-Functions are a **valid type of subjects**, and that's where `OnionJS` ✨ **S H I N E S** ✨
+`OnionJS` really shines when **wrapping functions** with [middlewares](https://en.wikipedia.org/wiki/Middleware).
 
 In this case, layers receive `before` functions and return `after` functions (hence the _"high-order function"_ name):
 
@@ -149,10 +149,10 @@ const jsonStringifyRespBody: Layer<
 }
 ```
 
-Now we can use this layer to `wrap` and `produce` functions 🙌 With literally the same code:
+Now we can use this layer to `wrap` and `produce` functions 🙌 With literally the same code as above:
 
 ```ts
-import { Onion } from 'onion.js'
+import { Onion } from '@onion.js/core'
 
 const before = () => ({ body: { foo: 'bar' } })
 
@@ -215,7 +215,7 @@ const after = Onion.wrap({ yolo: { foo: 'bar' } })
 We can even compose customizable layers by making good use of the `ComposeLayers` type:
 
 ```ts
-import type { ComposeLayers } from 'onion.js'
+import type { ComposeLayers } from '@onion.js/core'
 
 type LogAndStringifyPropLayer<KEY extends string> = ComposeLayers<
   LogObjectLayer,
