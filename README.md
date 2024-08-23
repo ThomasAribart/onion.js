@@ -6,7 +6,7 @@
 
 # 🧅 Wrap everything, without breaking types 🥲
 
-`Onion.JS` is a **type-safe** and **ultra-lightweight** (2Kb) library to design and apply **wrappers**, based on [HotScript](https://github.com/gvergnaud/hotscript) **high-order types**.
+`Onion.JS` is a **type-safe** and **ultra-lightweight** _(2KB)_ library to design and apply **wrappers**, based on [HotScript](https://github.com/gvergnaud/hotscript) **high-order types**.
 
 In particular, it's awesome for building and using type-safe [**middlewares**](https://en.wikipedia.org/wiki/Middleware) (see the [dedicated section](#-building-middlewares)).
 
