@@ -2,7 +2,7 @@ import type { F, O } from 'hotscript'
 import type { A } from 'ts-toolbelt'
 
 import { Layer } from './layer'
-import { Onion, OnionWrap } from './onion'
+import { Onion } from './onion'
 
 type JSONStringifyLayer<PATH extends string> = Layer<
   Record<string, unknown>,
@@ -20,42 +20,43 @@ const jsonStringifyProp =
 describe('Onion', () => {
   describe('object', () => {
     test('JSON stringifies prop upward', () => {
-      const after = Onion.wrap({ foo: 'bar', body: { foo: 'bar' } }).with(
+      const after = Onion.wrap({ headers: null, body: { foo: 'bar' } }).with(
         jsonStringifyProp('body')
       )
 
       const assertAfter: A.Equals<
         typeof after,
-        OnionWrap<{ foo: string; body: string }>
+        { headers: null; body: string }
       > = 1
       assertAfter
 
       expect(after).toStrictEqual({
-        foo: 'bar',
-        body: JSON.stringify({ foo: 'bar' }),
-        with: expect.any(Function)
+        headers: null,
+        body: JSON.stringify({ foo: 'bar' })
       })
     })
 
     test('JSON stringifies prop inward', () => {
-      const onion = Onion.produce<{ foo: string; body: string }>().with(
+      const onion = Onion.produce<{ headers: null; body: string }>().with(
         jsonStringifyProp('body')
       )
 
       const assertBefore: A.Equals<
         Parameters<(typeof onion)['from']>,
-        [{ foo: string; body: object }]
+        [{ headers: null; body: object }]
       > = 1
       assertBefore
 
-      const after = onion.from({ foo: 'bar', body: { foo: 'bar' } })
+      const after = onion.from({ headers: null, body: { foo: 'bar' } })
 
-      const assertAfter: A.Equals<typeof after, { foo: string; body: string }> =
-        1
+      const assertAfter: A.Equals<
+        typeof after,
+        { headers: null; body: string }
+      > = 1
       assertAfter
 
       expect(after).toStrictEqual({
-        foo: 'bar',
+        headers: null,
         body: JSON.stringify({ foo: 'bar' })
       })
     })
@@ -74,37 +75,42 @@ describe('Onion', () => {
     }
 
     test('JSON stringifies resp body outward', () => {
-      const before = () => ({ body: { foo: 'bar' } })
+      const before = () => ({ headers: null, body: { foo: 'bar' } })
       const after = Onion.wrap(before).with(jsonStringifyRespBody)
 
       const assertAfter: A.Equals<
         typeof after,
-        OnionWrap<() => { body: string }>
+        () => { headers: null; body: string }
       > = 1
       assertAfter
 
       expect(after()).toStrictEqual({
+        headers: null,
         body: JSON.stringify({ foo: 'bar' })
       })
     })
 
     test('JSON stringifies resp body inward', () => {
-      const onion = Onion.produce<() => { body: string }>().with(
+      const onion = Onion.produce<() => { headers: null; body: string }>().with(
         jsonStringifyRespBody
       )
 
       const assertBefore: A.Equals<
         Parameters<(typeof onion)['from']>,
-        [() => { body: unknown }]
+        [() => { headers: null; body: unknown }]
       > = 1
       assertBefore
 
-      const after = onion.from(() => ({ body: { foo: 'bar' } }))
+      const after = onion.from(() => ({ headers: null, body: { foo: 'bar' } }))
 
-      const assertAfter: A.Equals<typeof after, () => { body: string }> = 1
+      const assertAfter: A.Equals<
+        typeof after,
+        () => { headers: null; body: string }
+      > = 1
       assertAfter
 
       expect(after()).toStrictEqual({
+        headers: null,
         body: JSON.stringify({ foo: 'bar' })
       })
     })

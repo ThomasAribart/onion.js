@@ -1,79 +1,53 @@
-# 🧅 OnionJS
+<img src="assets/header-round-medium.png" width="100%" align="center" />
 
-Type-safe way to declare, use and compose high-order functions library based on [Hotscript](https://github.com/gvergnaud/hotscript).
+<p align="right">
+  <i>If you use this repo, star it ✨</i>
+</p>
 
-## Layers
+# 🧅 Wrap everything, without breaking types 🥲
 
-```mermaid
-flowchart RL
-  after[After]
+`Onion.JS` is a **type-safe** and **ultra-lightweight** (2Kb) library to design and apply **wrappers**, based on [HotScript](https://github.com/gvergnaud/hotscript) **high-order types**.
 
-  subgraph layer4[" "]
-    direction BT
-    subgraph layer3[" "]
-      subgraph layer2[" "]
-        subgraph layer1[" "]
-          before((Before))
-        end
-      end
-    end
-  before --> after
-  end
+In particular, it's awesome for building and using type-safe [**middlewares**](https://en.wikipedia.org/wiki/Middleware) (see the [dedicated section](#-building-middlewares)).
 
-  style before fill:#fff,stroke:none;
-  style layer1 fill:#F3EBFF,stroke:none,rx:100,ry:100;
-  style layer2 fill:#E7D6FF,stroke:none,rx:100,ry:100;
-  style layer3 fill:#DAC2FF,stroke:none,rx:100,ry:100;
-  style layer4 rx:100,ry:100, fill:none,stroke:none;
-  style after fill:none,stroke:none;
-  style layers fill:none,stroke:none,color:#aaa;
+## Table of content
 
-  layers["Layers"] ~~~ layer4
+- 🎬 [Installation](#-installation)
+- 🌈 [Layers](#-layers)
+- 🧅 <a href="#-onionwrap"><code>Onion.wrap</code></a>
+- ♻️ <a href="#️-onionproducetype"><code>Onion.produce</code></a>
+- 🚀 [Building Middlewares](#-building-middlewares)
+- 🏗️ [Composing Layers](#-composing-layers)
+- 💪 [Customizable Layers](#-customizable-layers)
+
+## 🎬 Installation
+
+```bash
+# npm
+npm install @onion.js/core
+
+# yarn
+yarn add @onion.js/core
 ```
 
-In `Onion.JS`, _**Layers**_ are functions that transform _**Subjects**_ from a `before` state to an `after` state.
+## 🌈 Layers
 
-```mermaid
-flowchart RL
-  after[After]
+In `Onion.JS`, _**Layers**_ are functions that transform _**Subjects**_ from a `before` to an `after` state:
 
-  subgraph layer4[" "]
-    direction BT
-    subgraph layer3[" "]
-      subgraph layer2[" "]
-        subgraph layer1[" "]
-          before((Before))
-        end
-      end
-    end
-  before --> after
-  end
+<img src="assets/layers.png" width="100%" align="center" />
 
-  style before fill:#fff,stroke:none;
-  style layer1 fill:#F3EBFF,stroke:none,rx:100,ry:100;
-  style layer2 fill:#E7D6FF,stroke:none,rx:100,ry:100;
-  style layer3 fill:#DAC2FF,stroke:none,rx:100,ry:100;
-  style layer4 rx:100,ry:100, fill:none,stroke:none;
-  style after fill:none,stroke:none;
-  style layers fill:none,stroke:none,color:#aaa;
-
-  layers["Layers"] ~~~ layer4
-```
-
-_**Layers**_ are functions that transform _**Subjects**_ from a `before` state to an `after` state.
-
-For instance, you may want to `JSON.stringify` the `body` property of an object:
+For instance, let's define a layer that `JSON.stringifies` the `'body'` property of an object:
 
 <!-- NOTE: We could simply use JSON.stringify as a layer once Return exists: https://github.com/gvergnaud/hotscript/issues/121 -->
 
 ```ts
+import type { Layer } from '@onion.js/core'
 import type { Objects } from 'hotscript'
-import type { Layer } from 'onion.js'
 
 const jsonStringifyBody: Layer<
   Record<string, unknown>, // subject type
-  Objects.Update<'body', string>, // outward HOFn
-  Objects.Update<'body', unknown> // inward HOFn
+  Objects.Update<'body', string>, // outward HO Type
+  Objects.Update<'body', unknown> // inward HO Type
 > = before => {
   const after = {
     ...before,
@@ -84,79 +58,89 @@ const jsonStringifyBody: Layer<
 }
 ```
 
-Now, you can wrap any object with this layer like this:
+## 🧅 `Onion.wrap`
 
-<!-- EQUATION (A) HERE -->
+We can now apply this layer to any object with `Onion.wrap`:
 
 ```ts
-import { Onion } from 'onion.js'
+import { Onion } from '@onion.js/core'
 
 const before = {
+  headers: null,
   body: { foo: 'bar' }
 }
 
 const after = Onion.wrap(before).with(jsonStringifyBody)
-//      ^? { body: string } 🙌
+//      ^? { headers: null; body: string } 🙌
 ```
 
-This example was with one layer, but we can combine as many as we want:
+Notice how the `after` type is correctly inferred thanks to [Hotscript](https://github.com/gvergnaud/hotscript) high-order types!
+
+...And why stop here? Let's add **more layers**:
 
 ```ts
 import type { Identity } from 'hotscript'
-import type { Layer } from 'onion.js'
 
-// Logs the subject
-const logSubject: Layer<Record<string, unknown>, Identity, Identity> = before => {
+// Logs the object
+const logObject: Layer<
+  Record<string, unknown>,
+  Identity,
+  Identity
+> = before => {
   console.log(before)
   return before
 }
 
 // Layers are gracefully composed 🙌
 const after = Onion.wrap(before).with(
-  logSubject, // 1st layer
+  logObject, // 1st layer
   jsonStringifyBody, // 2nd layer etc.
   ...
 )
 ```
 
-Layers can also work "inward": Given an after type and some layers, `Onion.js` can infer the `before` type:
+## ♻️ `Onion.produce<TYPE>`
 
-```
-AFTER INTERFACE - LAYERS (inward) => BEFORE INTERFACE
-```
+But wait, that's not all! Layers can also work _**inward**_ 🤯
+
+Given an `after` type and some layers, `OnionJS` can infer the expected `before` type:
+
+<img src="assets/infer-before-type.png" width="100%" align="center" />
+
+For instance, we can reuse `jsonStringifyBody` to produce the same result as above with `Onion.produce`:
 
 ```ts
-const after = Onion.produce<{ body: string }>()
+const after = Onion.produce<{ headers: null; body: string }>()
   .with(
     jsonStringifyBody, // last layer
-    log, // 2nd to last etc.
+    logObject, // 2nd to last etc.
     ...
   )
-  .from({ body: { foo: 'bar' } })
-//   ^? ({ body: unknown }) => { body: string } 🙌
+  .from({ headers: null, body: { foo: 'bar' } })
+//   ^? ({ headers: null; body: unknown }) => { headers: null; body: string } 🙌
 ```
 
-> [!TIP]
-> This makes reading more natural. If, just follow your eyes from the before to the after, the layers will be applied in that order.
+> ☝️ Note that layers are applied in reverse for improved readability.
 
-## High-Order Functions
+## 🚀 Building Middlewares
 
-**Functions** are a valid type of subjects, and that's where `OnionJS` shines ✨
+Functions are a **valid type of subjects**, and that's where `OnionJS` ✨ **S H I N E S** ✨
 
-In this case, layers receive `before` functions and return `after` functions (hence the _"high-order function"_ name).
+In this case, layers receive `before` functions and return `after` functions (hence the _"high-order function"_ name):
+
+<img src="assets/functions.png" width="100%" align="center" />
 
 For instance, let's apply `jsonStringifyBody` to the **output** of a function:
 
 ```ts
+import type { Layer } from '@onion.js/core'
 import type { Functions, Objects } from 'hotscript'
-import type { Layer, Onion } from 'onion.js'
 
 const jsonStringifyRespBody: Layer<
   (...params: unknown[]) => Record<string, unknown>,
   Functions.MapReturnType<Objects.Update<'body', string>>,
   Functions.MapReturnType<Objects.Update<'body', unknown>>
 > = before => {
-  // `before` and `after` are functions now
   function after(...params: unknown[]) {
     return jsonStringifyBody(before(...params))
   }
@@ -165,7 +149,7 @@ const jsonStringifyRespBody: Layer<
 }
 ```
 
-Now we can do the same as above:
+Now we can use this layer to `wrap` and `produce` functions 🙌 With literally the same code:
 
 ```ts
 import { Onion } from 'onion.js'
@@ -181,25 +165,29 @@ const produced = Onion.produce<() => { body: string }>()
 //   ^? (before: () => { body: unknown }) => (() => { body: string }) 🙌
 ```
 
-## Composing
+## 🏗️ Composing Layers
 
-That will gracefully `compose` helper to combine Layers both at run-time and type-wise to create a new layer:
+You can create new layers from existing ones with `compose`:
 
 ```ts
-import { compose } from 'onion.js'
+import { compose, Onion } from '@onion.js/core'
 
-// Layers are gracefully composed 🙌
-const logAndStringify = compose(log, jsonStringifyBody)
+const composedLayer = compose(logObject, jsonStringifyBody, ...)
+const after = Onion.wrap(before).with(composedLayer)
 
-const after = Onion.wrap({ body: { foo: 'bar' } }).with(logAndStringify)
-//      ^? { body: string } 🙌
+// Similar to:
+const after = Onion.wrap(before).with(
+  logObject,
+  jsonStringifyBody,
+  ...
+)
 ```
 
-## Dynamic Layers
+## 💪 Customizable Layers
 
-Sometimes, layer behaviors need to a specific context.
+Layers can **accept parameters** to allow for customization. But make sure to use [generics](https://www.typescriptlang.org/docs/handbook/2/generics.html) if needed!
 
-Nothing stops us from **dynamically generate layers** by using generic types:
+For instance, let's define a `jsonStringifyProp` layer that `JSON.stringifies` any property you want:
 
 ```ts
 type JSONStringifyPropLayer<KEY extends string> = Layer<
@@ -224,25 +212,21 @@ const after = Onion.wrap({ yolo: { foo: 'bar' } })
   .with(jsonStringifyProp('yolo'))
 ```
 
-We can even compose dynamically, just need to be a bit careful with types, and use the `ComposeLayers`:
+We can even compose customizable layers by making good use of the `ComposeLayers` type:
 
 ```ts
 import type { ComposeLayers } from 'onion.js'
 
 type LogAndStringifyPropLayer<KEY extends string> = ComposeLayers<
-  LogLayer,
+  LogObjectLayer,
   JSONStringifyPropLayer<KEY>
 >
 
 const logAndStringifyProp = <KEY extends string>(
   key: KEY
-): JSONStringifyPropLayer<KEY> => compose(log, jsonStringifyProp(key))
+): JSONStringifyPropLayer<KEY> => compose(logOject, jsonStringifyProp(key))
 
 const after = Onion.wrap({ yolo: { foo: 'bar' } })
   //    ^? { yolo: string } 🙌
   .with(jsonStringifyProp('yolo'))
 ```
-
-## What else?
-
-**Lightweight** Only 3KB
