@@ -63,7 +63,7 @@ jobs:
       - name: 🏗️ Set up Node.js
         uses: actions/setup-node@v4
         with:
-          registry-url: https://registry.npmjs.org
+          registry-url: https://registry.npmjs.org/
 
       - name: 🚚 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -82,4 +82,4 @@ jobs:
         run: pnpm version $RELEASE_VERSION --no-git-tag-version
 
       - name: 🚀 Release (4/4)
-        run: pnpm publish --access public --tag $RELEASE_NPM_TAG --no-git-checks
+        run: npm publish --access public --tag $RELEASE_NPM_TAG --no-git-checks
