@@ -25,7 +25,7 @@ export type Types<
 > = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
   ? LAYERS_HEAD extends Layer
     ? LAYERS_TAIL extends Layer[]
-      ? Types<LAYERS_TAIL, [...OUTPUT, InwardFn<LAYERS_HEAD>]>
+      ? Types<LAYERS_TAIL, [...OUTPUT, Type<LAYERS_HEAD>]>
       : never
     : never
   : OUTPUT
