@@ -29,6 +29,9 @@ jobs:
       - name: ♻️ Checkout
         uses: actions/checkout@v4
 
+      - name: 📌 Set shas
+        uses: nrwl/nx-set-shas@v4
+
       - name: 🏗️ Set up pnpm
         uses: pnpm/action-setup@v4.0.0
 
@@ -40,11 +43,11 @@ jobs:
       - name: 🚚 Install dependencies
         run: |
           pnpm install --frozen-lockfile
-          pnpm add --save-dev typescript@${{ matrix.typescript }}
+          pnpm add --save-dev typescript@${{ matrix.typescript }} -w
         shell: bash
 
       - name: 🎯 Run tests
-        run: pnpm test
+        run: pnpm test-affected
 
   release:
     name: 🚀 Release
@@ -70,18 +73,19 @@ jobs:
       - name: 🏗️ Build
         run: pnpm build
 
-      - name: 🚀 Release (1/4)
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: 📌 Set packages versions
+        run: pnpm set-packages-versions ${{ github.event.release.tag_name }}
 
-      - name: 🚀 Release (2/4)
+      - name: 🔄 Copy paste root README to @onion.js/core
+        run: cp README.md ./packages/core/README.md
+
+      - name: 🚀 Release (1/2)
         run: echo "RELEASE_NPM_TAG=${{ github.event.release.prerelease && 'alpha' ||  'latest' }}" >> $GITHUB_ENV
 
-      - name: 🚀 Release (3/4)
-        run: pnpm version $RELEASE_VERSION --no-git-tag-version
-
-      - name: 🚀 Release (4/4)
+      - name: 🚀 Release (2/2)
         uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_TOKEN }}
           tag: ${{ env.RELEASE_NPM_TAG }}
           strategy: upgrade
+          package: ./packages/core/package.json

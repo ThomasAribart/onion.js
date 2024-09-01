@@ -20,7 +20,8 @@
     "lib": ["esnext"],
     "types": ["node", "vitest/globals"],
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true
   },
   "compileOnSave": false,
   "exclude": ["node_modules", "dist", "vitest.config.ts"],

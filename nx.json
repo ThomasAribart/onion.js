@@ -1,0 +1,33 @@
+{
+  "extends": "@nrwl/workspace/presets/npm.json",
+  "npmScope": "onion.js",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["package", "test"],
+        "cacheDirectory": "nx-cache"
+      }
+    }
+  },
+  "targetDependencies": {
+    "package": [
+      {
+        "target": "package",
+        "projects": "dependencies"
+      }
+    ],
+    "test": [
+      {
+        "target": "package",
+        "projects": "dependencies"
+      }
+    ]
+  },
+  "affected": {
+    "defaultBase": "main"
+  },
+  "implicitDependencies": {
+    "*": "*"
+  }
+}

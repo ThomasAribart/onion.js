@@ -1,5 +1,4 @@
-import type { F, O } from 'hotscript'
-import type { A } from 'ts-toolbelt'
+import type { B, Call, F, O } from 'hotscript'
 
 import { Layer } from './layer'
 import { Onion } from './onion'
@@ -24,10 +23,9 @@ describe('Onion', () => {
         jsonStringifyProp('body')
       )
 
-      const assertAfter: A.Equals<
-        typeof after,
-        { headers: null; body: string }
-      > = 1
+      const assertAfter: Call<
+        B.Equals<typeof after, { headers: null; body: string }>
+      > = true
       assertAfter
 
       expect(after).toStrictEqual({
@@ -41,18 +39,19 @@ describe('Onion', () => {
         jsonStringifyProp('body')
       )
 
-      const assertBefore: A.Equals<
-        Parameters<(typeof onion)['from']>,
-        [{ headers: null; body: object }]
-      > = 1
+      const assertBefore: Call<
+        B.Equals<
+          Parameters<(typeof onion)['from']>,
+          [{ headers: null; body: object }]
+        >
+      > = true
       assertBefore
 
       const after = onion.from({ headers: null, body: { foo: 'bar' } })
 
-      const assertAfter: A.Equals<
-        typeof after,
-        { headers: null; body: string }
-      > = 1
+      const assertAfter: Call<
+        B.Equals<typeof after, { headers: null; body: string }>
+      > = true
       assertAfter
 
       expect(after).toStrictEqual({
@@ -78,10 +77,9 @@ describe('Onion', () => {
       const before = () => ({ headers: null, body: { foo: 'bar' } })
       const after = Onion.wrap(before).with(jsonStringifyRespBody)
 
-      const assertAfter: A.Equals<
-        typeof after,
-        () => { headers: null; body: string }
-      > = 1
+      const assertAfter: Call<
+        B.Equals<typeof after, () => { headers: null; body: string }>
+      > = true
       assertAfter
 
       expect(after()).toStrictEqual({
@@ -95,18 +93,19 @@ describe('Onion', () => {
         jsonStringifyRespBody
       )
 
-      const assertBefore: A.Equals<
-        Parameters<(typeof onion)['from']>,
-        [() => { headers: null; body: unknown }]
-      > = 1
+      const assertBefore: Call<
+        B.Equals<
+          Parameters<(typeof onion)['from']>,
+          [() => { headers: null; body: unknown }]
+        >
+      > = true
       assertBefore
 
       const after = onion.from(() => ({ headers: null, body: { foo: 'bar' } }))
 
-      const assertAfter: A.Equals<
-        typeof after,
-        () => { headers: null; body: string }
-      > = 1
+      const assertAfter: Call<
+        B.Equals<typeof after, () => { headers: null; body: string }>
+      > = true
       assertAfter
 
       expect(after()).toStrictEqual({
