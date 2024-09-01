@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "rootDir": "src",
+    "outDir": "./dist/types",
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "exclude": ["./dist"],
+  "include": ["./**/*.ts"]
+}

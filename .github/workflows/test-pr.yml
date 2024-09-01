@@ -41,6 +41,9 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
+      - name: 📌 Set shas
+        uses: nrwl/nx-set-shas@v4
+
       - name: 🏗️ Set up pnpm
         uses: pnpm/action-setup@v4.0.0
 
@@ -52,8 +55,8 @@ jobs:
       - name: 🚚 Install dependencies
         run: |
           pnpm install --frozen-lockfile
-          pnpm add --save-dev typescript@${{ matrix.typescript }}
+          pnpm add --save-dev typescript@${{ matrix.typescript }} -w
         shell: bash
 
       - name: 🎯 Run tests
-        run: pnpm test
+        run: pnpm test-affected
