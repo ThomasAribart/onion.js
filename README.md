@@ -171,12 +171,16 @@ const produced = Onion.produce<() => { body: string }>()
 
 ## 🏗️ Composing Layers
 
-You can create new layers from existing ones with `compose`:
+You can create new layers from existing ones with `composeDown` and `composeUp`:
 
 ```ts
 import { compose, Onion } from '@onion.js/core'
 
-const composedLayer = compose(logObject, jsonStringifyBody, ...)
+const composedLayer = composeDown(
+  logObject, // 1st layer
+  jsonStringifyBody, // 2nd layer etc.
+  ...
+)
 const after = Onion.wrap(before).with(composedLayer)
 
 // Similar to:
@@ -186,6 +190,8 @@ const after = Onion.wrap(before).with(
   ...
 )
 ```
+
+> It is advised to use `composeDown` when wrapping, and `composeUp` when producing for better readability.
 
 ## 💪 Customizable Layers
 
@@ -216,19 +222,19 @@ const after = Onion.wrap({ yolo: { foo: 'bar' } })
   .with(jsonStringifyProp('yolo'))
 ```
 
-We can even compose customizable layers by making good use of the `ComposeLayers` type:
+We can even compose customizable layers by making good use of the `ComposeUpLayers` and `ComposeDownLayers` type:
 
 ```ts
-import type { ComposeLayers } from '@onion.js/core'
+import type { ComposeDownLayers } from '@onion.js/core'
 
-type LogAndStringifyPropLayer<KEY extends string> = ComposeLayers<
+type LogAndStringifyPropLayer<KEY extends string> = ComposeDownLayers<
   LogObjectLayer,
   JSONStringifyPropLayer<KEY>
 >
 
 const logAndStringifyProp = <KEY extends string>(
   key: KEY
-): JSONStringifyPropLayer<KEY> => compose(logOject, jsonStringifyProp(key))
+): JSONStringifyPropLayer<KEY> => composeDown(logOject, jsonStringifyProp(key))
 
 const after = Onion.wrap({ yolo: { foo: 'bar' } })
   //    ^? { yolo: string } 🙌

@@ -1,6 +1,6 @@
 export { Onion } from './onion.js'
-export { compose } from './compose.js'
-export type { ComposeLayers } from './compose.js'
+export { composeUp, composeDown } from './compose.js'
+export type { ComposeUpLayers, ComposeDownLayers } from './compose.js'
 export type {
   Layer,
   Type,
