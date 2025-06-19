@@ -166,7 +166,7 @@ const after = Onion.wrap(before).with(jsonStringifyRespBody)
 const produced = Onion.produce<() => { body: string }>()
   .with(jsonStringifyRespBody)
   .from(before)
-//   ^? (before: () => { body: unknown }) => (() => { body: string }) 🙌
+//   ^? (before: () => { body: unknown }) 🙌
 ```
 
 ## 🏗️ Composing Layers
@@ -224,13 +224,14 @@ const after = Onion.wrap({ yolo: { foo: 'bar' } })
 
 We can even compose customizable layers by making good use of the `ComposeUpLayers` and `ComposeDownLayers` type:
 
+<!-- prettier-ignore -->
 ```ts
 import type { ComposeDownLayers } from '@onion.js/core'
 
-type LogAndStringifyPropLayer<KEY extends string> = ComposeDownLayers<
+type LogAndStringifyPropLayer<KEY extends string> = ComposeDownLayers<[
   LogObjectLayer,
   JSONStringifyPropLayer<KEY>
->
+]>
 
 const logAndStringifyProp = <KEY extends string>(
   key: KEY
