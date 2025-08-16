@@ -3,21 +3,7 @@ import type {
   Compose as ComposeUp
 } from 'hotscript'
 
-import type { InwardFns, Layer, OutwardFns, Types } from './layer.js'
-
-type Loosest<TYPES extends unknown[], OUTPUT = never> = TYPES extends [
-  infer TYPES_HEAD,
-  ...infer TYPES_TAIL
-]
-  ? Loosest<
-      TYPES_TAIL,
-      [TYPES_HEAD] extends [OUTPUT]
-        ? OUTPUT
-        : [OUTPUT] extends [TYPES_HEAD]
-          ? TYPES_HEAD
-          : never
-    >
-  : OUTPUT
+import type { After, Before, InFns, Layer, OutFns } from './layer.js'
 
 const composeTwo =
   (layerA: Layer, layerB: Layer) =>
@@ -26,10 +12,29 @@ const composeTwo =
 
 const identity: Layer = (arg: unknown): unknown => arg
 
-export type ComposeUpLayers<LAYERS extends Layer[]> = Layer<
-  Loosest<Types<LAYERS>>,
-  ComposeUp<OutwardFns<LAYERS>>,
-  ComposeDown<InwardFns<LAYERS>>
+type First<ITEMS extends unknown[]> = ITEMS extends [
+  infer ITEMS_HEAD,
+  ...unknown[]
+]
+  ? ITEMS_HEAD
+  : never
+
+type Last<ITEMS extends unknown[], OUTPUT = never> = ITEMS extends [
+  infer ITEMS_HEAD,
+  ...infer ITEMS_TAIL
+]
+  ? Last<ITEMS_TAIL, ITEMS_HEAD>
+  : OUTPUT
+
+export type ComposeUpLayers<
+  LAYERS extends Layer[],
+  FIRST_LAYER = First<LAYERS>,
+  LAST_LAYER = Last<LAYERS>
+> = Layer<
+  FIRST_LAYER extends Layer ? Before<FIRST_LAYER> : never,
+  ComposeUp<OutFns<LAYERS>>,
+  LAST_LAYER extends Layer ? After<LAST_LAYER> : never,
+  ComposeDown<InFns<LAYERS>>
 >
 
 export const composeUp = <LAYERS extends Layer[]>(
@@ -37,10 +42,15 @@ export const composeUp = <LAYERS extends Layer[]>(
 ): ComposeUpLayers<LAYERS> =>
   layers.reduce(composeTwo, identity) as ComposeUpLayers<LAYERS>
 
-export type ComposeDownLayers<LAYERS extends Layer[]> = Layer<
-  Loosest<Types<LAYERS>>,
-  ComposeDown<OutwardFns<LAYERS>>,
-  ComposeUp<InwardFns<LAYERS>>
+export type ComposeDownLayers<
+  LAYERS extends Layer[],
+  FIRST_LAYER = First<LAYERS>,
+  LAST_LAYER = Last<LAYERS>
+> = Layer<
+  LAST_LAYER extends Layer ? Before<LAST_LAYER> : never,
+  ComposeDown<OutFns<LAYERS>>,
+  FIRST_LAYER extends Layer ? After<FIRST_LAYER> : never,
+  ComposeUp<InFns<LAYERS>>
 >
 
 export const composeDown = <LAYERS extends Layer[]>(

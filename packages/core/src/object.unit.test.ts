@@ -4,8 +4,9 @@ import { Layer } from './layer'
 import { Onion } from './onion'
 
 type JSONStringifyLayer<PATH extends string> = Layer<
-  Record<string, unknown>,
+  { [KEY in PATH]: Record<string, unknown> },
   O.Update<PATH, string>,
+  { [KEY in PATH]: string },
   O.Update<PATH, object>
 >
 
@@ -63,8 +64,9 @@ describe('Onion', () => {
 
   describe('function', () => {
     const jsonStringifyRespBody: Layer<
-      (...params: unknown[]) => Record<string, unknown>,
+      (...params: unknown[]) => { body: Record<string, unknown> },
       F.MapReturnType<O.Update<'body', string>>,
+      (...params: unknown[]) => { body: string },
       F.MapReturnType<O.Update<'body', unknown>>
     > = before => {
       const after = (...params: unknown[]) =>
