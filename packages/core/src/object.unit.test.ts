@@ -1,4 +1,4 @@
-import type { B, Call, F, O } from 'hotscript'
+import type { B, Call, F, Identity, O, S } from 'hotscript'
 
 import { Layer } from './layer'
 import { Onion } from './onion'
@@ -114,6 +114,43 @@ describe('Onion', () => {
         headers: null,
         body: JSON.stringify({ foo: 'bar' })
       })
+    })
+  })
+
+  describe('type-safety', () => {
+    const numIdentity: Layer<number, Identity, number, Identity> = num => num
+    const prefix: Layer<
+      string,
+      S.Prepend<'_'>,
+      `_${string}`,
+      S.TrimLeft<'_'>
+    > = str => `_${str}`
+
+    test("produces never if layers don't match", () => {
+      const after = Onion.wrap('str').with(prefix, numIdentity)
+
+      const assertAfter: Call<B.Equals<typeof after, never>> = true
+      assertAfter
+
+      // Still applies the layers (only static type-checking)
+      expect(after).toStrictEqual('_str')
+    })
+
+    test("infers never if layers don't match", () => {
+      const onion = Onion.produce<string>().with(prefix, numIdentity)
+
+      const assertBefore: Call<
+        B.Equals<Parameters<(typeof onion)['from']>, [never]>
+      > = true
+      assertBefore
+
+      const after = onion.from(
+        // @ts-expect-error before has type never
+        'str'
+      )
+
+      // Still applies the layers (only static type-checking)
+      expect(after).toStrictEqual('_str')
     })
   })
 })

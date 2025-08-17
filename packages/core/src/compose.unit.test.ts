@@ -7,7 +7,7 @@ import { Onion } from './onion'
 type WrapLayer<PATH extends string> = Layer<
   { [KEY in PATH]: unknown },
   O.Update<PATH, O.Record<'_'>>,
-  { [KEY in PATH]: { _: unknown } },
+  { [KEY in PATH]: { _?: unknown } },
   O.Update<PATH, O.Get<'_'>>
 >
 

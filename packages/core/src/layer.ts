@@ -1,4 +1,4 @@
-import type { Fn } from 'hotscript'
+import type { Call, Fn, PartialApply } from 'hotscript'
 
 const $types = Symbol('$types')
 type $types = typeof $types
@@ -22,9 +22,12 @@ export interface Layer<
 
 export type Before<LAYER extends Layer> = NonNullable<LAYER[$types]>['before']
 
-export type After<LAYER extends Layer> = NonNullable<LAYER[$types]>['after']
+export type OutFn<LAYER extends Layer> = PartialApply<
+  TypedCall,
+  [NonNullable<LAYER[$types]>['outFn'], Before<LAYER>]
+>
 
-export type OutFn<LAYER extends Layer> = NonNullable<LAYER[$types]>['outFn']
+export type After<LAYER extends Layer> = NonNullable<LAYER[$types]>['after']
 
 export type OutFns<
   LAYERS extends Layer[],
@@ -37,7 +40,10 @@ export type OutFns<
     : never
   : OUT_FNS
 
-export type InFn<LAYER extends Layer> = NonNullable<LAYER[$types]>['inFn']
+export type InFn<LAYER extends Layer> = PartialApply<
+  TypedCall,
+  [NonNullable<LAYER[$types]>['inFn'], After<LAYER>]
+>
 
 export type InFns<
   LAYERS extends Layer[],
@@ -49,3 +55,16 @@ export type InFns<
       : never
     : never
   : OUTPUT
+
+interface TypedCall extends Fn {
+  return: this['args'] extends [
+    infer FN extends Fn,
+    infer CONSTRAINT,
+    infer ARG,
+    ...unknown[]
+  ]
+    ? ARG extends CONSTRAINT
+      ? Call<FN, ARG>
+      : never
+    : never
+}

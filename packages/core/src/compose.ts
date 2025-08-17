@@ -26,14 +26,10 @@ type Last<ITEMS extends unknown[], OUTPUT = never> = ITEMS extends [
   ? Last<ITEMS_TAIL, ITEMS_HEAD>
   : OUTPUT
 
-export type ComposeUpLayers<
-  LAYERS extends Layer[],
-  FIRST_LAYER = First<LAYERS>,
-  LAST_LAYER = Last<LAYERS>
-> = Layer<
-  FIRST_LAYER extends Layer ? Before<FIRST_LAYER> : never,
+export type ComposeUpLayers<LAYERS extends Layer[]> = Layer<
+  Last<LAYERS> extends Layer ? Before<Last<LAYERS>> : never,
   ComposeUp<OutFns<LAYERS>>,
-  LAST_LAYER extends Layer ? After<LAST_LAYER> : never,
+  First<LAYERS> extends Layer ? After<First<LAYERS>> : never,
   ComposeDown<InFns<LAYERS>>
 >
 
@@ -42,14 +38,10 @@ export const composeUp = <LAYERS extends Layer[]>(
 ): ComposeUpLayers<LAYERS> =>
   layers.reduce(composeTwo, identity) as ComposeUpLayers<LAYERS>
 
-export type ComposeDownLayers<
-  LAYERS extends Layer[],
-  FIRST_LAYER = First<LAYERS>,
-  LAST_LAYER = Last<LAYERS>
-> = Layer<
-  LAST_LAYER extends Layer ? Before<LAST_LAYER> : never,
+export type ComposeDownLayers<LAYERS extends Layer[]> = Layer<
+  First<LAYERS> extends Layer ? Before<First<LAYERS>> : never,
   ComposeDown<OutFns<LAYERS>>,
-  FIRST_LAYER extends Layer ? After<FIRST_LAYER> : never,
+  Last<LAYERS> extends Layer ? After<Last<LAYERS>> : never,
   ComposeUp<InFns<LAYERS>>
 >
 
