@@ -1,12 +1,13 @@
 import type { B, Call, O } from 'hotscript'
 
 import { composeDown, composeUp } from './compose'
-import { Layer } from './layer'
+import type { Layer } from './layer'
 import { Onion } from './onion'
 
 type WrapLayer<PATH extends string> = Layer<
-  Record<string, unknown>,
+  { [KEY in PATH]: unknown },
   O.Update<PATH, O.Record<'_'>>,
+  { [KEY in PATH]: { _?: unknown } },
   O.Update<PATH, O.Get<'_'>>
 >
 
@@ -18,8 +19,9 @@ const wrapProp =
   })
 
 type JSONStringifyLayer<PATH extends string> = Layer<
-  Record<string, unknown>,
+  { [KEY in PATH]: Record<string, unknown> },
   O.Update<PATH, string>,
+  { [KEY in PATH]: string },
   O.Update<PATH, Record<string, unknown>>
 >
 
@@ -34,7 +36,11 @@ describe('compose', () => {
   describe('composeDown', () => {
     test('applies wraps > JSONStringifies (outward)', () => {
       const after = Onion.wrap({ headers: null, body: { foo: 'bar' } }).with(
-        composeDown(wrapProp('body'), jsonStringifyProp('body'))
+        composeDown(
+          //
+          wrapProp('body'),
+          jsonStringifyProp('body')
+        )
       )
 
       const assertAfter: Call<

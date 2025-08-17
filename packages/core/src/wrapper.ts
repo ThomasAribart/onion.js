@@ -1,6 +1,6 @@
 import type { Pipe } from 'hotscript'
 
-import type { Layer, OutwardFns } from './layer.js'
+import type { Layer, OutFns } from './layer.js'
 
 const $before = Symbol('$before')
 type $before = typeof $before
@@ -14,10 +14,10 @@ export class Wrapper<BEFORE> {
 
   with<LAYERS extends Layer[]>(
     ...layers: LAYERS
-  ): Pipe<BEFORE, OutwardFns<LAYERS>> {
+  ): Pipe<BEFORE, OutFns<LAYERS>> {
     return layers.reduce(
       (acc, layer) => layer(acc),
       this[$before] as unknown
-    ) as Pipe<BEFORE, OutwardFns<LAYERS>>
+    ) as Pipe<BEFORE, OutFns<LAYERS>>
   }
 }

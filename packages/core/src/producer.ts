@@ -1,6 +1,6 @@
 import type { Pipe } from 'hotscript'
 
-import type { InwardFns, Layer } from './layer.js'
+import type { InFns, Layer } from './layer.js'
 
 const $layers = Symbol('$layers')
 type $layers = typeof $layers
@@ -18,7 +18,7 @@ export class Producer<AFTER, LAYERS extends Layer[] = Layer[]> {
     return new Producer(...layers)
   }
 
-  from(before: Pipe<AFTER, InwardFns<LAYERS>>): AFTER {
+  from(before: Pipe<AFTER, InFns<LAYERS>>): AFTER {
     return [...this[$layers]]
       .reverse()
       .reduce((acc, hof) => hof(acc), before as unknown) as AFTER

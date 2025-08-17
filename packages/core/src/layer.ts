@@ -1,57 +1,70 @@
-import type { Fn } from 'hotscript'
+import type { Call, Fn, PartialApply } from 'hotscript'
 
 const $types = Symbol('$types')
 type $types = typeof $types
 
 export interface Layer<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TYPE = any,
-  OUTWARD_FN extends Fn = Fn,
-  INWARD_FN extends Fn = Fn
+  BEFORE = any,
+  OUT_FN extends Fn = Fn,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  AFTER = any,
+  IN_FN extends Fn = Fn
 > {
-  (arg: TYPE): TYPE
+  (arg: BEFORE): AFTER
   [$types]?: {
-    type: TYPE
-    outFn: OUTWARD_FN
-    inFn: INWARD_FN
+    before: BEFORE
+    outFn: OUT_FN
+    after: AFTER
+    inFn: IN_FN
   }
 }
 
-export type Type<LAYER extends Layer> = NonNullable<LAYER[$types]>['type']
+export type Before<LAYER extends Layer> = NonNullable<LAYER[$types]>['before']
 
-export type Types<
+export type OutFn<LAYER extends Layer> = PartialApply<
+  TypedCall,
+  [NonNullable<LAYER[$types]>['outFn'], Before<LAYER>]
+>
+
+export type After<LAYER extends Layer> = NonNullable<LAYER[$types]>['after']
+
+export type OutFns<
   LAYERS extends Layer[],
-  OUTPUT extends unknown[] = []
+  OUT_FNS extends Fn[] = []
 > = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
   ? LAYERS_HEAD extends Layer
     ? LAYERS_TAIL extends Layer[]
-      ? Types<LAYERS_TAIL, [...OUTPUT, Type<LAYERS_HEAD>]>
+      ? OutFns<LAYERS_TAIL, [...OUT_FNS, OutFn<LAYERS_HEAD>]>
       : never
     : never
-  : OUTPUT
+  : OUT_FNS
 
-export type OutwardFn<LAYER extends Layer> = NonNullable<LAYER[$types]>['outFn']
+export type InFn<LAYER extends Layer> = PartialApply<
+  TypedCall,
+  [NonNullable<LAYER[$types]>['inFn'], After<LAYER>]
+>
 
-export type OutwardFns<
-  LAYERS extends Layer[],
-  OUTPUT extends Fn[] = []
-> = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
-  ? LAYERS_HEAD extends Layer
-    ? LAYERS_TAIL extends Layer[]
-      ? OutwardFns<LAYERS_TAIL, [...OUTPUT, OutwardFn<LAYERS_HEAD>]>
-      : never
-    : never
-  : OUTPUT
-
-export type InwardFn<LAYER extends Layer> = NonNullable<LAYER[$types]>['inFn']
-
-export type InwardFns<
+export type InFns<
   LAYERS extends Layer[],
   OUTPUT extends Fn[] = []
 > = LAYERS extends [infer LAYERS_HEAD, ...infer LAYERS_TAIL]
   ? LAYERS_HEAD extends Layer
     ? LAYERS_TAIL extends Layer[]
-      ? InwardFns<LAYERS_TAIL, [...OUTPUT, InwardFn<LAYERS_HEAD>]>
+      ? InFns<LAYERS_TAIL, [...OUTPUT, InFn<LAYERS_HEAD>]>
       : never
     : never
   : OUTPUT
+
+interface TypedCall extends Fn {
+  return: this['args'] extends [
+    infer FN extends Fn,
+    infer CONSTRAINT,
+    infer ARG,
+    ...unknown[]
+  ]
+    ? ARG extends CONSTRAINT
+      ? Call<FN, ARG>
+      : never
+    : never
+}
