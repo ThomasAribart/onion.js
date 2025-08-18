@@ -63,8 +63,55 @@ interface TypedCall extends Fn {
     infer ARG,
     ...unknown[]
   ]
-    ? ARG extends CONSTRAINT
+    ? CovariantExtends<ARG, CONSTRAINT> extends true
       ? Call<FN, ARG>
       : never
     : never
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFn = (...params: any[]) => any
+
+type Extends<LEFT, RIGHT> = LEFT extends RIGHT ? true : false
+
+type CovariantExtends<LEFT, RIGHT> = LEFT extends AnyFn
+  ? RIGHT extends AnyFn
+    ? CovariantExtends<Parameters<LEFT>, Parameters<RIGHT>> extends true
+      ? CovariantExtends<ReturnType<LEFT>, ReturnType<RIGHT>>
+      : false
+    : false
+  : LEFT extends [infer LEFT_HEAD, ...infer LEFT_TAIL]
+    ? RIGHT extends [infer RIGHT_HEAD, ...infer RIGHT_TAIL]
+      ? CovariantExtends<LEFT_HEAD, RIGHT_HEAD> extends true
+        ? CovariantExtends<LEFT_TAIL, RIGHT_TAIL>
+        : false
+      : RIGHT extends unknown[]
+        ? CovariantExtends<LEFT_HEAD, RIGHT[number]> extends true
+          ? CovariantExtends<LEFT_TAIL, RIGHT>
+          : false
+        : Extends<LEFT, RIGHT>
+    : LEFT extends unknown[]
+      ? RIGHT extends [infer RIGHT_HEAD, ...infer RIGHT_TAIL]
+        ? CovariantExtends<LEFT[number], RIGHT_HEAD> extends true
+          ? CovariantExtends<LEFT, RIGHT_TAIL>
+          : false
+        : RIGHT extends unknown[]
+          ? CovariantExtends<LEFT[number], RIGHT[number]>
+          : Extends<LEFT, RIGHT>
+      : LEFT extends Set<infer LEFT_ELEMENTS>
+        ? RIGHT extends Set<infer RIGHT_ELEMENTS>
+          ? CovariantExtends<LEFT_ELEMENTS, RIGHT_ELEMENTS>
+          : Extends<LEFT, RIGHT>
+        : LEFT extends object
+          ? RIGHT extends object
+            ? {
+                [KEY in keyof RIGHT]-?: KEY extends keyof LEFT
+                  ? CovariantExtends<LEFT[KEY], RIGHT[KEY]>
+                  : IsOptionalKey<RIGHT, KEY>
+              }[keyof RIGHT]
+            : Extends<LEFT, RIGHT>
+          : Extends<LEFT, RIGHT>
+
+type IsOptionalKey<OBJECT extends object, KEY extends keyof OBJECT> =
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  {} extends Pick<OBJECT, KEY> ? true : false
