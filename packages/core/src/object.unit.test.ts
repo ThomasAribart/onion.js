@@ -1,6 +1,7 @@
+/* eslint-disable max-lines */
 import type { B, Call, F, Identity, O, S } from 'hotscript'
 
-import { Layer } from './layer'
+import type { Layer } from './layer'
 import { Onion } from './onion'
 
 type JSONStringifyLayer<PATH extends string> = Layer<
@@ -151,6 +152,53 @@ describe('Onion', () => {
 
       // Still applies the layers (only static type-checking)
       expect(after).toStrictEqual('_str')
+    })
+  })
+
+  describe('co-variance', () => {
+    test('does a co-variant check of function args', () => {
+      const fnIdentity: Layer<
+        (arg: { a: number }, ...restParams: unknown[]) => number,
+        Identity,
+        (arg: { a: number }, ...restParams: unknown[]) => number,
+        Identity
+      > = fn => fn
+
+      const after = Onion.wrap(
+        ({ a, b }: { a: number; b: number }) => a + b
+      ).with(fnIdentity)
+
+      const assertAfter: Call<
+        B.Equals<typeof after, ({ a, b }: { a: number; b: number }) => number>
+      > = true
+      assertAfter
+
+      // Still applies the layers (only static type-checking)
+      expect(after({ a: 2, b: 3 })).toBe(5)
+    })
+
+    test('does a co-variant check on class methods', () => {
+      class Adder {
+        add({ a, b }: { a: number; b: number }) {
+          return a + b
+        }
+      }
+
+      const methodIdentity: Layer<
+        { add: (arg: { a: number }, ...restParams: unknown[]) => number },
+        Identity,
+        { add: (arg: { a: number }, ...restParams: unknown[]) => number },
+        Identity
+      > = fn => fn
+
+      const adder = new Adder()
+      const after = Onion.wrap(adder).with(methodIdentity)
+
+      const assertAfter: Call<B.Equals<typeof after, Adder>> = true
+      assertAfter
+
+      // Still applies the layers (only static type-checking)
+      expect(after.add({ a: 2, b: 3 })).toBe(5)
     })
   })
 })
