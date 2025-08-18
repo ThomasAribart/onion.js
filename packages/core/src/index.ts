@@ -8,5 +8,6 @@ export type {
   OutFn,
   OutFns,
   InFn,
-  InFns
+  InFns,
+  CovariantExtends
 } from './layer.js'
