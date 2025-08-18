@@ -64,7 +64,9 @@ interface TypedCall extends Fn {
     ...unknown[]
   ]
     ? CovariantExtends<ARG, CONSTRAINT> extends true
-      ? Call<FN, ARG>
+      ? true extends CovariantExtends<ARG, CONSTRAINT>
+        ? Call<FN, ARG>
+        : never
       : never
     : never
 }
@@ -72,45 +74,51 @@ interface TypedCall extends Fn {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyFn = (...params: any[]) => any
 
-type Extends<LEFT, RIGHT> = LEFT extends RIGHT ? true : false
-
-type CovariantExtends<LEFT, RIGHT> = LEFT extends AnyFn
-  ? RIGHT extends AnyFn
-    ? CovariantExtends<Parameters<LEFT>, Parameters<RIGHT>> extends true
-      ? CovariantExtends<ReturnType<LEFT>, ReturnType<RIGHT>>
-      : false
-    : false
-  : LEFT extends [infer LEFT_HEAD, ...infer LEFT_TAIL]
-    ? RIGHT extends [infer RIGHT_HEAD, ...infer RIGHT_TAIL]
-      ? CovariantExtends<LEFT_HEAD, RIGHT_HEAD> extends true
-        ? CovariantExtends<LEFT_TAIL, RIGHT_TAIL>
+export type CovariantExtends<LEFT, RIGHT> = unknown extends RIGHT
+  ? true
+  : LEFT extends AnyFn
+    ? RIGHT extends AnyFn
+      ? CovariantExtends<Parameters<LEFT>, Parameters<RIGHT>> extends true
+        ? CovariantExtends<ReturnType<LEFT>, ReturnType<RIGHT>>
         : false
-      : RIGHT extends unknown[]
-        ? CovariantExtends<LEFT_HEAD, RIGHT[number]> extends true
-          ? CovariantExtends<LEFT_TAIL, RIGHT>
-          : false
-        : Extends<LEFT, RIGHT>
-    : LEFT extends unknown[]
-      ? RIGHT extends [infer RIGHT_HEAD, ...infer RIGHT_TAIL]
-        ? CovariantExtends<LEFT[number], RIGHT_HEAD> extends true
-          ? CovariantExtends<LEFT, RIGHT_TAIL>
-          : false
-        : RIGHT extends unknown[]
-          ? CovariantExtends<LEFT[number], RIGHT[number]>
-          : Extends<LEFT, RIGHT>
-      : LEFT extends Set<infer LEFT_ELEMENTS>
-        ? RIGHT extends Set<infer RIGHT_ELEMENTS>
-          ? CovariantExtends<LEFT_ELEMENTS, RIGHT_ELEMENTS>
-          : Extends<LEFT, RIGHT>
-        : LEFT extends object
-          ? RIGHT extends object
-            ? {
-                [KEY in keyof RIGHT]-?: KEY extends keyof LEFT
-                  ? CovariantExtends<LEFT[KEY], RIGHT[KEY]>
-                  : IsOptionalKey<RIGHT, KEY>
-              }[keyof RIGHT]
-            : Extends<LEFT, RIGHT>
-          : Extends<LEFT, RIGHT>
+      : never
+    : LEFT extends Promise<infer LEFT_AWAITED>
+      ? RIGHT extends Promise<infer RIGHT_AWAITED>
+        ? CovariantExtends<LEFT_AWAITED, RIGHT_AWAITED>
+        : never
+      : LEFT extends [infer LEFT_HEAD, ...infer LEFT_TAIL]
+        ? RIGHT extends [infer RIGHT_HEAD, ...infer RIGHT_TAIL]
+          ? CovariantExtends<LEFT_HEAD, RIGHT_HEAD> extends true
+            ? CovariantExtends<LEFT_TAIL, RIGHT_TAIL>
+            : false
+          : RIGHT extends unknown[]
+            ? CovariantExtends<LEFT_HEAD, RIGHT[number]> extends true
+              ? CovariantExtends<LEFT_TAIL, RIGHT>
+              : false
+            : never
+        : LEFT extends unknown[]
+          ? RIGHT extends [infer RIGHT_HEAD, ...infer RIGHT_TAIL]
+            ? CovariantExtends<LEFT[number], RIGHT_HEAD> extends true
+              ? CovariantExtends<LEFT, RIGHT_TAIL>
+              : false
+            : RIGHT extends unknown[]
+              ? CovariantExtends<LEFT[number], RIGHT[number]>
+              : never
+          : LEFT extends Set<infer LEFT_ELEMENTS>
+            ? RIGHT extends Set<infer RIGHT_ELEMENTS>
+              ? CovariantExtends<LEFT_ELEMENTS, RIGHT_ELEMENTS>
+              : never
+            : LEFT extends object
+              ? RIGHT extends object
+                ? {
+                    [KEY in keyof RIGHT]-?: KEY extends keyof LEFT
+                      ? CovariantExtends<LEFT[KEY], RIGHT[KEY]>
+                      : IsOptionalKey<RIGHT, KEY>
+                  }[keyof RIGHT]
+                : never
+              : LEFT extends RIGHT
+                ? true
+                : false
 
 type IsOptionalKey<OBJECT extends object, KEY extends keyof OBJECT> =
   // eslint-disable-next-line @typescript-eslint/ban-types
