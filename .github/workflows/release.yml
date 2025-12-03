@@ -71,6 +71,10 @@ jobs:
         with:
           registry-url: 'https://registry.npmjs.org'
 
+        # v11.5.1 or later is required for OIDC authentication
+      - name: ⬆️ Update npm
+        run: npm install -g npm@latest
+
       - name: 🚚 Install dependencies
         run: pnpm install --frozen-lockfile
         shell: bash
