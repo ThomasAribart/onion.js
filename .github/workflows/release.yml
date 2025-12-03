@@ -88,4 +88,4 @@ jobs:
         run: echo "RELEASE_NPM_TAG=${{ github.event.release.prerelease && 'alpha' ||  'latest' }}" >> $GITHUB_ENV
 
       - name: 🚀 Release (2/2)
-        run: pnpm publish --tag ${{ env.RELEASE_NPM_TAG }}
+        run: pnpm publish --tag ${{ env.RELEASE_NPM_TAG }} --no-git-checks
